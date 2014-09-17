@@ -8,13 +8,15 @@ angular.module 'beansApp'
     controller: 'MainCtrl'
 
   .state 'game',
-    url: '/games',
+    url: '/games'
     abstract: true
 
   .state 'game.new',
-    url: '/new',
-    templateUrl: 'app/game/new.html'
-    controller: 'NewGameCtrl'
+    url: '/new'
+    views:
+      '@':
+        templateUrl: 'app/game/new.html'
+        controller: 'NewGameCtrl'
 
   .state 'game.play',
     url: '/:gameId',

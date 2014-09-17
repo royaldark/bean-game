@@ -1,0 +1,39 @@
+<div ng-include="'components/navbar/navbar.html'"></div>
+
+<header class="hero-unit" id="banner">
+  <div class="container">
+    <h1>New Game</h1>
+    <p class="lead">Start a new game of Bohnanaza!</p>
+    <img src="assets/images/yeoman.png" alt="I'm Yeoman">
+  </div>
+</header>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="page-header">Games:</h1>
+      <ul class="nav nav-tabs nav-stacked col-md-4 col-lg-4 col-sm-6" ng-repeat="game in games">
+        <li>
+          {{ game.name }}<br>
+          Players: <span ng-repeat="player in game.players">{{ player.name }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <form class="thing-form">
+    <label>Play online with friends</label>
+    <p class="input-group">
+      <input type="text" class="form-control" placeholder="Number of players" ng-model="numPlayers" required ng-pattern="/^\d$/"><br>
+      <input type="text" class="form-control" placeholder="Game description" ng-model="gameTitle" required ng-pattern="/^\d$/"><br>
+      <button type="submit" class="btn btn-primary" ng-click="newGame()">Start Game</button>
+    </p>
+  </form>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <p>Bohnanza 0.0.1 |
+         <a href="https://github.com/royaldark/bean-game">Source Code</a></p>
+  </div>
+</footer>
