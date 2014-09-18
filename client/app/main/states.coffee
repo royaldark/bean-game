@@ -20,5 +20,7 @@ angular.module 'beansApp'
 
   .state 'game.play',
     url: '/:gameId',
-    templateUrl: 'app/game/play.html'
-    controller: 'PlayGameCtrl'
+    views:
+      '@':
+        templateUrl: 'app/game/play.html'
+        controller: 'PlayGameCtrl'
