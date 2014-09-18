@@ -5,6 +5,9 @@ angular.module 'beansApp'
   $scope.menu = [
     title: 'Home'
     link: '/'
+  ,
+    title: 'New Game'
+    link: '/games/new'
   ]
   $scope.isCollapsed = true
 

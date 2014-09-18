@@ -2,17 +2,22 @@
 
 angular.module 'beansApp'
 .controller 'NewGameCtrl', ($scope, $http, $state, socket, api) ->
-  $scope.games = []
 
   api.get('games').success (awesomeThings) ->
     $scope.games = awesomeThings
     socket.syncUpdates 'game', $scope.games
 
   _.extend $scope,
+    games: []
+    players: [{}, {}]
+
+    addPlayer: ->
+      @players.push {}
+
     newGame: ->
       api.post('games',
         name: @gameTitle
-        players: [{name: 'Joe'}]
+        players: @players
       ).then(
         (response) ->
           $state.go 'game.play', { gameId: response.data._id }
