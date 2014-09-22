@@ -1,6 +1,7 @@
 "use strict"
-_ = require("lodash")
-Game = require("./game.model")
+_ = require 'lodash'
+Q = require 'q'
+Game = require './game.model'
 
 CARD_TYPES = [
   name: 'Coffee Bean'
@@ -60,6 +61,8 @@ CARDS_PER_PLAYER = 5
 handleError = (res, err) ->
   res.send 500, err
 
+findGameById = Q.nbind(Game.findById, Game)
+
 exports.index = (req, res) ->
   Game.find (err, games) ->
     return handleError(res, err)  if err
@@ -99,29 +102,27 @@ exports.create = (req, res) ->
     res.json 201, game
 
 exports.nextPhase = (req, res) ->
-  Game.findById(req.params.id).exec().then(
-    (game) ->
-      if game.currentTurn.phase < 3
-        game.currentTurn.phase++
-      else
-        return handleError(res, error: 'This turn is already at the final stage.')
+  findGameById(req.params.id)
+  .then (game) ->
+    if game.currentTurn.phase < 3
+      game.currentTurn.phase++
+    else
+      return handleError(res, error: 'This turn is already at the final phase.')
 
-      game.save (err, game) ->
-        res.json 200, game
-
-    _.partial(handleError, res)
-  )
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
 
 exports.nextTurn = (req, res) ->
-  Game.findById(req.params.id).exec().then(
-    (game) ->
-      game.currentTurn.number++
-      game.currentTurn.phase = 0
-      game.save (err, game) ->
-        res.json 200, game
-
-    _.partial(handleError, res)
-  )
+  findGameById(req.params.id)
+  .then (game) ->
+    game.currentTurn.number++
+    game.currentTurn.phase = 0
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
 
 exports.update = (req, res) ->
   delete req.body._id  if req.body._id
