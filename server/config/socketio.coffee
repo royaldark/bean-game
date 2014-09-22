@@ -38,11 +38,7 @@ module.exports = (socketio) ->
   # }));
   socketio.on "connection", (socket) ->
     socket.connectedAt = new Date()
-    socket.address =
-      if socket.handshake.address == null
-        process.env.DOMAIN
-      else
-        socket.handshake.address.address + ":" + socket.handshake.address.port
+    socket.address = socket.handshake.address ? process.env.DOMAIN
 
     # Call onDisconnect.
     socket.on "disconnect", ->
