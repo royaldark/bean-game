@@ -1,22 +1,23 @@
 "use strict"
 mongoose = require("mongoose")
 Schema = mongoose.Schema
+
 Card = new Schema(
   name: String
   gold: [Number]
 )
-TurnState = new Schema(
-  drawPile: [Card]
-  discardPile: [Card]
-  playerHands: [
-    player: String
-    arr: [Card]
-  ]
-  whoseTurn: String
-)
+
 GameSchema = new Schema(
   name: String
-  players: Array
-  turnStates: [TurnState]
+  players: [
+    name: String
+    hand: [Card]
+  ]
+  drawPile: [Card]
+  discardPile: [Card]
+  currentTurn:
+    player: String
+    phase: Number
 )
+
 module.exports = mongoose.model("Game", GameSchema)

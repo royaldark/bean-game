@@ -69,26 +69,26 @@ exports.show = (req, res) ->
     res.json game
 
 exports.create = (req, res) ->
-  reduceFn = ({ deck, hands }, player) ->
+  reduceFn = ({ deck, players }, player) ->
     deck: _.rest(deck, 7)
-    hands: hands.concat([
-      player: player.name
-      arr: _.take(deck, 7)
+    players: players.concat([
+      name: player.name
+      hand: _.take(deck, 7)
     ])
 
   initialState =
     deck: _.shuffle(NEW_DECK)
-    hands: []
+    players: []
 
-  { deck, hands } = _.reduce(req.body.players, reduceFn, initialState)
+  { deck, players } = _.reduce(req.body.players, reduceFn, initialState)
 
   game = _.extend {}, req.body,
-    turnStates: [
-      drawPile: deck
-      discardPile: []
-      playerHands: hands
-      whoseTurn: req.body.players[0].name
-    ]
+    players: players
+    drawPile: deck
+    discardPile: []
+    currentTurn:
+      player: req.body.players[0].name
+      phase: 0
 
   Game.create game, (err, game) ->
     return handleError(res, err)  if err
