@@ -57,6 +57,8 @@ NEW_DECK = _.flatten(
       card
 )
 
+CARDS_PER_PLAYER = 5
+
 exports.index = (req, res) ->
   Game.find (err, games) ->
     return handleError(res, err)  if err
@@ -70,10 +72,10 @@ exports.show = (req, res) ->
 
 exports.create = (req, res) ->
   reduceFn = ({ deck, players }, player) ->
-    deck: _.rest(deck, 7)
+    deck: _.rest(deck, CARDS_PER_PLAYER)
     players: players.concat([
       name: player.name
-      hand: _.take(deck, 7)
+      hand: _.take(deck, CARDS_PER_PLAYER)
     ])
 
   initialState =
