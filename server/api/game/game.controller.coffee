@@ -50,7 +50,7 @@ CARD_TYPES = [
   gold: [null, 2, 3, 4]
 ]
 
-newDeck = _.flatten(
+NEW_DECK = _.flatten(
   for type in CARD_TYPES
     card = _.omit(type, ['quantity'])
     for instance in [1..type.quantity]
@@ -77,7 +77,7 @@ exports.create = (req, res) ->
     ])
 
   initialState =
-    deck: _.shuffle(newDeck)
+    deck: _.shuffle(NEW_DECK)
     hands: []
 
   { deck, hands } = _.reduce(req.body.players, reduceFn, initialState)
