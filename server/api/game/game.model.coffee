@@ -18,6 +18,7 @@ GameSchema = new Schema(
   currentTurn:
     player: String
     phase: Number
+    number: Number
 )
 
 module.exports = mongoose.model("Game", GameSchema)

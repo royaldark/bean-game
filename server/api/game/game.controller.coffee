@@ -1,5 +1,3 @@
-handleError = (res, err) ->
-  res.send 500, err
 "use strict"
 _ = require("lodash")
 Game = require("./game.model")
@@ -59,6 +57,9 @@ NEW_DECK = _.flatten(
 
 CARDS_PER_PLAYER = 5
 
+handleError = (res, err) ->
+  res.send 500, err
+
 exports.index = (req, res) ->
   Game.find (err, games) ->
     return handleError(res, err)  if err
@@ -91,10 +92,36 @@ exports.create = (req, res) ->
     currentTurn:
       player: req.body.players[0].name
       phase: 0
+      number: 0
 
   Game.create game, (err, game) ->
-    return handleError(res, err)  if err
+    return handleError(res, err) if err
     res.json 201, game
+
+exports.nextPhase = (req, res) ->
+  Game.findById(req.params.id).exec().then(
+    (game) ->
+      if game.currentTurn.phase < 3
+        game.currentTurn.phase++
+      else
+        return handleError(res, error: 'This turn is already at the final stage.')
+
+      game.save (err, game) ->
+        res.json 200, game
+
+    _.partial(handleError, res)
+  )
+
+exports.nextTurn = (req, res) ->
+  Game.findById(req.params.id).exec().then(
+    (game) ->
+      game.currentTurn.number++
+      game.currentTurn.phase = 0
+      game.save (err, game) ->
+        res.json 200, game
+
+    _.partial(handleError, res)
+  )
 
 exports.update = (req, res) ->
   delete req.body._id  if req.body._id
