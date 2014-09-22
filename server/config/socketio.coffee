@@ -38,6 +38,7 @@ module.exports = (socketio) ->
   # }));
   socketio.on "connection", (socket) ->
     socket.connectedAt = new Date()
+    console.log socket.client.id
     socket.address = socket.handshake.address ? process.env.DOMAIN
 
     # Call onDisconnect.

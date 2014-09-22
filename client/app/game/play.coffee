@@ -11,5 +11,10 @@ angular.module 'beansApp'
       'Draw new bean cards'
     ]
 
+    plant: (card) ->
+      api.post("games/#{$stateParams.gameId}/plant/#{card._id}/field/0")
+
   api.get("games/#{$stateParams.gameId}").success (game) ->
     $scope.playGame.game = game
+    socket.socket.on 'game:save', (game) ->
+      $scope.playGame.game = game

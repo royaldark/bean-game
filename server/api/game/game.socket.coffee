@@ -5,6 +5,7 @@ Broadcast updates to client when the model changes
 game = require("./game.model")
 
 onSave = (socket, doc, cb) ->
+  console.log "Emitting game:save"
   socket.emit "game:save", doc
 
 onRemove = (socket, doc, cb) ->

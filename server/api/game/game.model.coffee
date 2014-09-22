@@ -12,6 +12,10 @@ GameSchema = new Schema(
   players: [
     name: String
     hand: [Card]
+    fields: [
+      cards: [Card]
+    ]
+    gold: Number
   ]
   drawPile: [Card]
   discardPile: [Card]

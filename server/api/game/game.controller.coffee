@@ -59,6 +59,7 @@ NEW_DECK = _.flatten(
 CARDS_PER_PLAYER = 5
 
 handleError = (res, err) ->
+  console.log err
   res.send 500, err
 
 findGameById = Q.nbind(Game.findById, Game)
@@ -80,6 +81,8 @@ exports.create = (req, res) ->
     players: players.concat([
       name: player.name
       hand: _.take(deck, CARDS_PER_PLAYER)
+      fields: [null, null]
+      gold: 0
     ])
 
   initialState =
@@ -100,6 +103,34 @@ exports.create = (req, res) ->
   Game.create game, (err, game) ->
     return handleError(res, err) if err
     res.json 201, game
+
+findCardInHand = (players, cardId) ->
+  for player, playerIndex in players
+    for card, cardIndex in player.hand
+      if card._id.toString() == cardId
+        return { card, player, cardIndex, playerIndex }
+
+  return null
+
+exports.plantCard = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    { player, card, cardIndex, playerIndex } = findCardInHand(game.players, req.params.cardId)
+    { fieldIndex } = req.params
+
+    if 0 > fieldIndex > 2
+      return handleError(res, error: 'Invalid field.')
+    else if fieldIndex == 2 and player.fields.length < 2
+      return handleError(res, error: 'Player has not yet bought 3rd beanfield.')
+    else
+      player.fields[fieldIndex] ?= { cards: [] }
+      player.fields[fieldIndex].cards.push card
+      player.hand.splice(cardIndex, 1)
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
 
 exports.nextPhase = (req, res) ->
   findGameById(req.params.id)
