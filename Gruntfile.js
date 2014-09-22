@@ -123,7 +123,7 @@ module.exports = function (grunt) {
       },
       express: {
         files: [
-          'server/**/*.{js,json}'
+          'server/**/*.{coffee,json}'
         ],
         tasks: ['express:dev', 'wait'],
         options: {

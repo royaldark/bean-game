@@ -3,7 +3,7 @@ mongoose = require("mongoose")
 Schema = mongoose.Schema
 Card = new Schema(
   name: String
-  harvestCosts: [Number]
+  gold: [Number]
 )
 TurnState = new Schema(
   drawPile: [Card]
