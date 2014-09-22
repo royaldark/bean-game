@@ -1,7 +1,8 @@
-###*
-Main application file
-###
+# Main application file
 "use strict"
+
+# Register CoffeeScript compiler
+require 'coffee-script/register'
 
 # Set default node environment to development
 process.env.NODE_ENV = process.env.NODE_ENV or "development"
@@ -30,7 +31,6 @@ require("./routes") app
 server.listen config.port, config.ip, ->
   console.log "Express server listening on %d, in %s mode", config.port, app.get("env")
   return
-
 
 # Expose app
 exports = module.exports = app

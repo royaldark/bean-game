@@ -39,13 +39,15 @@ module.exports = function (grunt) {
       },
       dev: {
         options: {
-          script: 'server/app.js',
+          opts: ['node_modules/coffee-script/bin/coffee'],
+          script: 'server/app.coffee',
           debug: true
         }
       },
       prod: {
         options: {
-          script: 'dist/server/app.js'
+          opts: ['node_modules/coffee-script/bin/coffee'],
+          script: 'dist/server/app.coffee'
         }
       }
     },
@@ -605,7 +607,7 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'clean:server',
         'env:all',
-        'injector:sass', 
+        'injector:sass',
         'concurrent:server',
         'injector',
         'wiredep',
@@ -617,7 +619,7 @@ module.exports = function (grunt) {
     grunt.task.run([
       'clean:server',
       'env:all',
-      'injector:sass', 
+      'injector:sass',
       'concurrent:server',
       'injector',
       'wiredep',
@@ -647,7 +649,7 @@ module.exports = function (grunt) {
       return grunt.task.run([
         'clean:server',
         'env:all',
-        'injector:sass', 
+        'injector:sass',
         'concurrent:test',
         'injector',
         'autoprefixer',
@@ -660,7 +662,7 @@ module.exports = function (grunt) {
         'clean:server',
         'env:all',
         'env:test',
-        'injector:sass', 
+        'injector:sass',
         'concurrent:test',
         'injector',
         'wiredep',
@@ -678,7 +680,7 @@ module.exports = function (grunt) {
 
   grunt.registerTask('build', [
     'clean:dist',
-    'injector:sass', 
+    'injector:sass',
     'concurrent:dist',
     'injector',
     'wiredep',
