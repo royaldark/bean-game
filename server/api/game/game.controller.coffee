@@ -58,9 +58,8 @@ NEW_DECK = _.flatten(
 
 CARDS_PER_PLAYER = 5
 
-handleError = (res, err) ->
-  console.log err
-  res.send 500, err
+handleError = (res, error) ->
+  res.json 500, { error }
 
 findGameById = Q.nbind(Game.findById, Game)
 
@@ -81,7 +80,7 @@ exports.create = (req, res) ->
     players: players.concat([
       name: player.name
       hand: _.take(deck, CARDS_PER_PLAYER)
-      fields: [null, null]
+      fields: [{ cards: [] }, { cards: [] }]
       gold: 0
     ])
 
@@ -116,16 +115,32 @@ exports.plantCard = (req, res) ->
   findGameById(req.params.id)
   .then (game) ->
     { player, card, cardIndex, playerIndex } = findCardInHand(game.players, req.params.cardId)
-    { fieldIndex } = req.params
+    fieldIndex = req.params.fieldId
 
     if 0 > fieldIndex > 2
-      return handleError(res, error: 'Invalid field.')
+      return handleError(res, 'Invalid field.')
     else if fieldIndex == 2 and player.fields.length < 2
-      return handleError(res, error: 'Player has not yet bought 3rd beanfield.')
+      return handleError(res, 'Player has not yet bought 3rd beanfield.')
     else
-      player.fields[fieldIndex] ?= { cards: [] }
       player.fields[fieldIndex].cards.push card
       player.hand.splice(cardIndex, 1)
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
+
+exports.buyBeanField = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    player = game.players[0]
+    if player.fields.length > 2
+      return handleError(res, 'You cannot purchase more than 3 beanfields.')
+    else if player.gold < 3
+      return handleError(res, 'You do not have enough gold to purchase a 3rd beanfield.')
+
+    player.fields.push(player.fields.create { cards: [] })
+    player.gold -= 3
 
     Q.ninvoke(game, 'save')
   .then (game) ->
@@ -138,7 +153,7 @@ exports.nextPhase = (req, res) ->
     if game.currentTurn.phase < 3
       game.currentTurn.phase++
     else
-      return handleError(res, error: 'This turn is already at the final phase.')
+      return handleError(res, 'This turn is already at the final phase.')
 
     Q.ninvoke(game, 'save')
   .then (game) ->

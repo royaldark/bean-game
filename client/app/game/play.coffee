@@ -14,6 +14,10 @@ angular.module 'beansApp'
     plant: (card) ->
       api.post("games/#{$stateParams.gameId}/plant/#{card._id}/field/0")
 
+    buyBeanField: ->
+      api.post("games/#{$stateParams.gameId}/buyBeanField")
+
+
   api.get("games/#{$stateParams.gameId}").success (game) ->
     $scope.playGame.game = game
     socket.socket.on 'game:save', (game) ->

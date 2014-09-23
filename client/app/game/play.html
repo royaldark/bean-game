@@ -22,10 +22,10 @@
 
       Fields:<br>
       <div ng-repeat="field in playGame.game.players[0].fields track by $index">
-        Field {{ $index + 1 }}:
-        <span ng-repeat="card in field">
+        Field {{ $index + 1 }}:<br>
+        <span ng-repeat="card in field.cards">
           <strong>{{ card.name }}</strong><br>
-          Gold: {{ card.gold }}<br>
+          Gold: {{ card.gold }}<br><br>
         </span>
       </div>
 
@@ -35,6 +35,8 @@
         Gold: {{ card.gold }}<br>
         <a ng-click="playGame.plant(card)">Plant</a><br><br>
       </span>
+
+      <a ng-click="playGame.buyBeanField()">Buy Bean Field</a>
     </div>
   </div>
 </div>
