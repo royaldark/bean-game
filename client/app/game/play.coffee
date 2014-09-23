@@ -11,6 +11,10 @@ angular.module 'beansApp'
       'Draw new bean cards'
     ]
 
+    imagePath: (card) ->
+      cardPath = card.name.toLowerCase().replace(' ', '-')
+      "/assets/images/cards/#{cardPath}.png"
+
     plant: (card) ->
       api.post("games/#{$stateParams.gameId}/plant/#{card._id}/field/0")
 

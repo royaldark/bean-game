@@ -32,6 +32,7 @@
       Hand:<br>
       <span ng-repeat="card in playGame.game.players[0].hand">
         <strong>{{ card.name }}</strong><br>
+        <img ng-src="{{ playGame.imagePath(card) }}"">
         Gold: {{ card.gold }}<br>
         <a ng-click="playGame.plant(card)">Plant</a><br><br>
       </span>
