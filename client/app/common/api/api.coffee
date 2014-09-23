@@ -1,11 +1,10 @@
 'use strict'
 
 angular.module('beansApp').factory 'api', ($http) ->
-  _host = 'http://localhost:9000'
   _dir = 'api'
 
   _route = (path) ->
-    "#{_host}/#{_dir}/#{path}"
+    "/#{_dir}/#{path}"
 
   _makeRequest = (method, path, data, opts) ->
     $http[method](_route(path), data, opts)
