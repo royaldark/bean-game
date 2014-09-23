@@ -27,7 +27,7 @@ onConnect = (socket) ->
 
   # When the client emits 'info', this listens and executes
   socket.on "info", (data) ->
-    console.info "[%s] %s", socket.address, JSON.stringify(data, null, 2)
+    console.info "[%s:%s] %s", socket.address, clientHash, JSON.stringify(data, null, 2)
     return
 
   # Insert sockets below
@@ -58,8 +58,8 @@ module.exports = (socketio) ->
     # Call onDisconnect.
     socket.on "disconnect", ->
       onDisconnect(socket)
-      console.info "[%s] DISCONNECTED", socket.address
+      console.info "[%s:%s] DISCONNECTED", socket.address, hash(socket)
 
     # Call onConnect.
     onConnect(socket)
-    console.info "[%s] CONNECTED", socket.address
+    console.info "[%s:%s] CONNECTED", socket.address, hash(socket)
