@@ -3,13 +3,27 @@ Socket.io configuration
 ###
 "use strict"
 
-config = require("./environment")
+crypto = require 'crypto'
+config = require './environment'
+
+clients = {}
+
+hash = (socket) ->
+  crypto.createHash('md5').update(key(socket)).digest('hex')
+
+key = (socket) ->
+  "#{socket.address}:#{socket.client.id}"
 
 # When the user disconnects.. perform this
 onDisconnect = (socket) ->
+  delete clients[key(socket)]
 
 # When the user connects.. perform this
 onConnect = (socket) ->
+  clientHash = hash(socket)
+
+  clients[clientHash] = socket
+  socket.emit 'key', clientHash
 
   # When the client emits 'info', this listens and executes
   socket.on "info", (data) ->

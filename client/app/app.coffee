@@ -13,7 +13,7 @@ angular.module 'beansApp', [
   .otherwise '/'
 
   $locationProvider.html5Mode true
-.run ($rootScope) ->
+.run ($rootScope, socket) ->
   $rootScope.$on '$stateChangeError', (event, toState, toParams, fromState, fromParams, error) ->
     console.log "Error transitioning:
       #{fromState.name}(#{JSON.stringify fromParams}) ->
@@ -31,3 +31,6 @@ angular.module 'beansApp', [
     console.log "Successfully transitioned:
       #{fromState.name}(#{JSON.stringify fromParams}) ->
       #{toState.name}(#{JSON.stringify toParams})"
+
+  socket.socket.on 'key', (key) ->
+    $rootScope.clientKey = key
