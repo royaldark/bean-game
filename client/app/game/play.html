@@ -24,16 +24,13 @@
       <div ng-repeat="field in playGame.game.players[0].fields track by $index">
         Field {{ $index + 1 }}:<br>
         <span ng-repeat="card in field.cards">
-          <strong>{{ card.name }}</strong><br>
-          Gold: {{ card.gold }}<br><br>
+          <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186"><br><br>
         </span>
       </div>
 
       Hand:<br>
       <span ng-repeat="card in playGame.game.players[0].hand">
-        <strong>{{ card.name }}</strong><br>
-        <img ng-src="{{ playGame.imagePath(card) }}"">
-        Gold: {{ card.gold }}<br>
+        <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186">
         <a ng-click="playGame.plant(card)">Plant</a><br><br>
       </span>
 
