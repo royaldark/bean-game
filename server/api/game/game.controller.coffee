@@ -121,9 +121,38 @@ exports.plantCard = (req, res) ->
       return handleError(res, 'Invalid field.')
     else if fieldIndex == 2 and player.fields.length < 2
       return handleError(res, 'Player has not yet bought 3rd beanfield.')
+    else if game.currentTurn.phase not in [0, 2]
+      return handleError(res, 'Cards cannot be planted during this phase of the turn.')
     else
       player.fields[fieldIndex].cards.push card
       player.hand.splice(cardIndex, 1)
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
+
+exports.harvest = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    player = req.params.playerId
+    fieldIndex = req.params.fieldId
+
+    if 0 > fieldIndex > player.fields.length
+      return handleError(res, 'Invalid field.')
+
+    cards = player.fields[fieldIndex].cards
+    numToHarvest = cards.length
+
+    gold = 0
+    for numNeeded, index in cards[0].gold
+      if numToHarvest >= numNeeded
+        gold = index + 1
+
+    player.gold += gold
+
+    game.discardPile.push(cards...)
+    player.fields[fieldIndex].cards = []
 
     Q.ninvoke(game, 'save')
   .then (game) ->

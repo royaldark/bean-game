@@ -11,7 +11,8 @@ router.patch "/:id", controller.update
 router.delete "/:id", controller.destroy
 router.post '/:id/nextPhase', controller.nextPhase
 router.post '/:id/nextTurn', controller.nextTurn
-router.post '/:id/plant/:cardId/field/:fieldId', controller.plantCard
 router.post '/:id/buyBeanField', controller.buyBeanField
+router.post '/:id/harvest/:fieldId', controller.harvest
+router.post '/:id/plant/:cardId/field/:fieldId', controller.plantCard
 
 module.exports = router
