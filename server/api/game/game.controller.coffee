@@ -113,7 +113,8 @@ _findCardInHand = (players, cardId) ->
   return null
 
 _getPlayerById = (game, playerId) ->
-  _.find(game.players, _id: playerId)
+  _.find game.players, (player) ->
+      player._id.toString() == playerId
 
 _getPlayerByClientId = (game, clientId) ->
   _.find(game.players, { clientId })
@@ -191,11 +192,7 @@ exports.drawTwo = (req, res) ->
 exports.join = (req, res) ->
   findGameById(req.params.id)
   .then (game) ->
-    player = _.find game.players, (player) ->
-      player._id.toString() == req.params.playerId
-
-    console.log _.map(game.players, '_id')
-    console.log req.params.playerId
+    player = _findPlayerById(game, req.params.playerId)
 
     if not player
       return handleError(res, 'No such player.')
