@@ -103,7 +103,7 @@ exports.create = (req, res) ->
     return handleError(res, err) if err
     res.json 201, game
 
-findCardInHand = (players, cardId) ->
+_findCardInHand = (players, cardId) ->
   for player, playerIndex in players
     for card, cardIndex in player.hand
       if card._id.toString() == cardId
@@ -114,7 +114,7 @@ findCardInHand = (players, cardId) ->
 exports.plantCard = (req, res) ->
   findGameById(req.params.id)
   .then (game) ->
-    { player, card, cardIndex, playerIndex } = findCardInHand(game.players, req.params.cardId)
+    { player, card, cardIndex, playerIndex } = _findCardInHand(game.players, req.params.cardId)
     fieldIndex = req.params.fieldId
 
     if 0 > fieldIndex > 2
@@ -135,7 +135,7 @@ exports.plantCard = (req, res) ->
 exports.harvest = (req, res) ->
   findGameById(req.params.id)
   .then (game) ->
-    player = req.params.playerId
+    player = game.players[0]
     fieldIndex = req.params.fieldId
 
     if 0 > fieldIndex > player.fields.length
@@ -153,6 +153,42 @@ exports.harvest = (req, res) ->
 
     game.discardPile.push(cards...)
     player.fields[fieldIndex].cards = []
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
+
+_draw = (game, player, numToDraw) ->
+  if game.drawPile.length < numToDraw
+    game.drawPile.push _.shuffle(game.discardPile)...
+    game.discardPile = []
+
+  player.hand.push _.take(game.drawPile, numToDraw)...
+  game.drawPile = _.rest(game.drawPile, numToDraw)
+
+exports.drawTwo = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    player = game.players[0]
+    if game.currentTurn.phase != 1
+      return handleError(res, 'You cannot draw 2 during this phase.')
+
+    _draw(game, player, 2)
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
+
+exports.drawThree = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    player = game.players[0]
+    if game.currentTurn.phase != 3
+      return handleError(res, 'You cannot draw 3 during this phase.')
+
+    _draw(game, player, 3)
 
     Q.ninvoke(game, 'save')
   .then (game) ->

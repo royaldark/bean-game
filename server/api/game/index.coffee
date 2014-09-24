@@ -14,5 +14,7 @@ router.post '/:id/nextTurn', controller.nextTurn
 router.post '/:id/buyBeanField', controller.buyBeanField
 router.post '/:id/harvest/:fieldId', controller.harvest
 router.post '/:id/plant/:cardId/field/:fieldId', controller.plantCard
+router.post '/:id/drawTwo', controller.drawTwo
+router.post '/:id/drawThree', controller.drawThree
 
 module.exports = router
