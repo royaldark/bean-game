@@ -33,4 +33,5 @@ angular.module 'beansApp', [
       #{toState.name}(#{JSON.stringify toParams})"
 
   socket.socket.on 'key', (key) ->
+    console.log "Client key: #{key}"
     $rootScope.clientKey = key

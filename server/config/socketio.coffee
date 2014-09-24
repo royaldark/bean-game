@@ -22,7 +22,7 @@ onDisconnect = (socket) ->
 onConnect = (socket) ->
   clientHash = hash(socket)
 
-  clients[clientHash] = socket
+  socket.clientId = clientHash
   socket.emit 'key', clientHash
 
   # When the client emits 'info', this listens and executes

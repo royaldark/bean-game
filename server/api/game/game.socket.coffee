@@ -2,11 +2,18 @@
 Broadcast updates to client when the model changes
 ###
 "use strict"
-game = require("./game.model")
+game = require './game.model'
+_ = require 'lodash'
 
-onSave = (socket, doc, cb) ->
-  console.log "Emitting game:save"
-  socket.emit "game:save", doc
+onSave = (socket, game, cb) ->
+  clientIds = _(game.players)
+    .map 'clientId'
+    .compact()
+    .value()
+
+  if socket.clientId in clientIds
+    console.log "Emitting game:save"
+    socket.emit "game:save", game
 
 onRemove = (socket, doc, cb) ->
   socket.emit "game:remove", doc

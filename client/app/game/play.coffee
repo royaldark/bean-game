@@ -1,8 +1,9 @@
 'use strict'
 
 angular.module 'beansApp'
-.controller 'PlayGameCtrl', ($scope, $stateParams, socket, api) ->
+.controller 'PlayGameCtrl', ($rootScope, $scope, $stateParams, socket, api) ->
   $scope.playGame =
+    gameId: $stateParams.gameId
     game: null
     phases: [
       'Plant bean cards'
@@ -16,11 +17,13 @@ angular.module 'beansApp'
       "/assets/images/cards/#{cardPath}.png"
 
     plant: (card) ->
-      api.post("games/#{$stateParams.gameId}/plant/#{card._id}/field/0")
+      api.post("games/#{@gameId}/plant/#{card._id}/field/0")
 
     buyBeanField: ->
-      api.post("games/#{$stateParams.gameId}/buyBeanField")
+      api.post("games/#{@gameId}/buyBeanField")
 
+    join: (playerIndex) ->
+      api.post("games/#{@gameId}/join/#{playerIndex}", clientId: $rootScope.clientKey)
 
   api.get("games/#{$stateParams.gameId}").success (game) ->
     $scope.playGame.game = game

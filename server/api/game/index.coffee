@@ -16,5 +16,6 @@ router.post '/:id/harvest/:fieldId', controller.harvest
 router.post '/:id/plant/:cardId/field/:fieldId', controller.plantCard
 router.post '/:id/drawTwo', controller.drawTwo
 router.post '/:id/drawThree', controller.drawThree
+router.post '/:id/join/:playerId', controller.join
 
 module.exports = router

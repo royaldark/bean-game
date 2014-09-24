@@ -82,6 +82,7 @@ exports.create = (req, res) ->
       hand: _.take(deck, CARDS_PER_PLAYER)
       fields: [{ cards: [] }, { cards: [] }]
       gold: 0
+      clientId: null
     ])
 
   initialState =
@@ -110,6 +111,12 @@ _findCardInHand = (players, cardId) ->
         return { card, player, cardIndex, playerIndex }
 
   return null
+
+_getPlayerById = (game, playerId) ->
+  _.find(game.players, _id: playerId)
+
+_getPlayerByClientId = (game, clientId) ->
+  _.find(game.players, { clientId })
 
 exports.plantCard = (req, res) ->
   findGameById(req.params.id)
@@ -175,6 +182,25 @@ exports.drawTwo = (req, res) ->
       return handleError(res, 'You cannot draw 2 during this phase.')
 
     _draw(game, player, 2)
+
+    Q.ninvoke(game, 'save')
+  .then (game) ->
+    res.json 200, game
+  .catch(_.partial(handleError, res))
+
+exports.join = (req, res) ->
+  findGameById(req.params.id)
+  .then (game) ->
+    player = _.find game.players, (player) ->
+      player._id.toString() == req.params.playerId
+
+    console.log _.map(game.players, '_id')
+    console.log req.params.playerId
+
+    if not player
+      return handleError(res, 'No such player.')
+
+    player.clientId = req.body.clientId
 
     Q.ninvoke(game, 'save')
   .then (game) ->

@@ -11,6 +11,7 @@ GameSchema = new Schema(
   name: String
   players: [
     name: String
+    clientId: String
     hand: [Card]
     fields: [
       cards: [Card]

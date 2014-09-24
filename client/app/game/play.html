@@ -16,9 +16,10 @@
       Phase of Turn: {{ playGame.phases[playGame.game.currentTurn.phase] }}<br>
 
       Players:
-      <ul ng-repeat="player in playGame.game.players">
-        <li>{{ player.name }}</li>
-      </ul>
+      <div ng-repeat="player in playGame.game.players">
+        <strong>{{ player.name }}</strong><br>
+        <a ng-click="playGame.join(player._id)">Join</a><br><br>
+      </div>
 
       Fields:<br>
       <div ng-repeat="field in playGame.game.players[0].fields track by $index">
