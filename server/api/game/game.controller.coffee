@@ -201,22 +201,17 @@ exports.drawTwo = (req, res) ->
   .catch(_.partial(handleError, res))
 
 exports.join = (req, res) ->
-  console.log 'ok'
   findGameById(req.params.id)
   .then (game) ->
-    console.log 'ok2'
     player = _getPlayerById(game, req.params.playerId)
 
     if not player
-      console.log 'uh-oh'
       return Q.reject 'No such player.'
 
-    console.log 'ok3'
     player.clientId = req.body.clientId
 
     Q.ninvoke(game, 'save')
   .then (game) ->
-    console.log 'ok4'
     res.json 200, game
   .catch(_.partial(handleError, res))
 
