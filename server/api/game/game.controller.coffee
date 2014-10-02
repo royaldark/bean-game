@@ -132,6 +132,10 @@ _getGameAndPlayer = (gameId, clientId) ->
     else
       Q.reject 'There is no player in this game with that clientId.'
 
+_stackAllOfType = (field, card) ->
+  _.all field.cards, (fieldCard) ->
+    fieldCard.name == card.name
+
 exports.plantCard = (req, res) ->
   _getGameAndPlayer(req.params.id, req.body.clientId)
   .then ({ game, player }) ->
@@ -142,11 +146,16 @@ exports.plantCard = (req, res) ->
       return Q.reject 'Invalid field.'
     else if fieldIndex == 2 and player.fields.length < 2
       return Q.reject 'Player has not yet bought 3rd beanfield.'
-    else if game.currentTurn.phase not in [0, 2]
+
+    field = player.fields[fieldIndex]
+
+    if game.currentTurn.phase not in [0, 2]
       return Q.reject 'Cards cannot be planted during this phase of the turn.'
-    else
-      player.fields[fieldIndex].cards.push card
-      player.hand.splice(cardIndex, 1)
+    else if not _stackAllOfType(field, card)
+      return Q.reject "You cannot plant a #{card.name} in a field of #{field.cards[0].name}s."
+
+    field.cards.push card
+    player.hand.splice(cardIndex, 1)
 
     Q.ninvoke(game, 'save')
   .then (game) ->
