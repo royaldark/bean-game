@@ -32,7 +32,10 @@
       Hand:<br>
       <span ng-repeat="card in playGame.game.players[0].hand">
         <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186">
-        <a ng-click="playGame.plant(card)">Plant</a><br><br>
+        <a ng-repeat="field in playGame.game.players[0].fields track by $index" ng-click="playGame.plant(card, $index)">
+          Plant in Field {{ $index + 1 }}<br>
+        </a>
+        <br><br>
       </span>
 
       <a ng-click="playGame.buyBeanField()">Buy Bean Field</a>
