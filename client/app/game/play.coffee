@@ -17,10 +17,10 @@ angular.module 'beansApp'
       "/assets/images/cards/#{cardPath}.png"
 
     plant: (card) ->
-      api.post("games/#{@gameId}/plant/#{card._id}/field/0")
+      api.post("games/#{@gameId}/plant/#{card._id}/field/0", clientId: $rootScope.clientKey)
 
     buyBeanField: ->
-      api.post("games/#{@gameId}/buyBeanField")
+      api.post("games/#{@gameId}/buyBeanField", clientId: $rootScope.clientKey)
 
     join: (playerIndex) ->
       api.post("games/#{@gameId}/join/#{playerIndex}", clientId: $rootScope.clientKey)

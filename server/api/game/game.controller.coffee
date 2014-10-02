@@ -59,7 +59,12 @@ NEW_DECK = _.flatten(
 CARDS_PER_PLAYER = 5
 
 handleError = (res, error) ->
-  res.json 500, { error }
+  status = if _.isString(error) then 403 else 500
+
+  if error instanceof Error
+    console.log error
+
+  res.json status, { error }
 
 findGameById = Q.nbind(Game.findById, Game)
 
@@ -104,33 +109,41 @@ exports.create = (req, res) ->
     return handleError(res, err) if err
     res.json 201, game
 
-_findCardInHand = (players, cardId) ->
-  for player, playerIndex in players
-    for card, cardIndex in player.hand
-      if card._id.toString() == cardId
-        return { card, player, cardIndex, playerIndex }
+_findCardInHand = (player, cardId) ->
+  for card, cardIndex in player.hand
+    if card._id.toString() == cardId
+      return { card, cardIndex }
 
   return null
 
 _getPlayerById = (game, playerId) ->
   _.find game.players, (player) ->
-      player._id.toString() == playerId
+    player._id.toString() == playerId
 
 _getPlayerByClientId = (game, clientId) ->
   _.find(game.players, { clientId })
 
-exports.plantCard = (req, res) ->
-  findGameById(req.params.id)
+_getGameAndPlayer = (gameId, clientId) ->
+  findGameById(gameId)
   .then (game) ->
-    { player, card, cardIndex, playerIndex } = _findCardInHand(game.players, req.params.cardId)
+    player = _getPlayerByClientId(game, clientId)
+    if player
+      { game, player }
+    else
+      Q.reject 'There is no player in this game with that clientId.'
+
+exports.plantCard = (req, res) ->
+  _getGameAndPlayer(req.params.id, req.body.clientId)
+  .then ({ game, player }) ->
+    { card, cardIndex } = _findCardInHand(player, req.params.cardId)
     fieldIndex = req.params.fieldId
 
     if 0 > fieldIndex > 2
-      return handleError(res, 'Invalid field.')
+      return Q.reject 'Invalid field.'
     else if fieldIndex == 2 and player.fields.length < 2
-      return handleError(res, 'Player has not yet bought 3rd beanfield.')
+      return Q.reject 'Player has not yet bought 3rd beanfield.'
     else if game.currentTurn.phase not in [0, 2]
-      return handleError(res, 'Cards cannot be planted during this phase of the turn.')
+      return Q.reject 'Cards cannot be planted during this phase of the turn.'
     else
       player.fields[fieldIndex].cards.push card
       player.hand.splice(cardIndex, 1)
@@ -141,13 +154,12 @@ exports.plantCard = (req, res) ->
   .catch(_.partial(handleError, res))
 
 exports.harvest = (req, res) ->
-  findGameById(req.params.id)
-  .then (game) ->
-    player = game.players[0]
+  _getGameAndPlayer(req.params.id, req.body.clientId)
+  .then ({ game, player }) ->
     fieldIndex = req.params.fieldId
 
     if 0 > fieldIndex > player.fields.length
-      return handleError(res, 'Invalid field.')
+      return Q.reject 'Invalid field.'
 
     cards = player.fields[fieldIndex].cards
     numToHarvest = cards.length
@@ -176,11 +188,10 @@ _draw = (game, player, numToDraw) ->
   game.drawPile = _.rest(game.drawPile, numToDraw)
 
 exports.drawTwo = (req, res) ->
-  findGameById(req.params.id)
-  .then (game) ->
-    player = game.players[0]
+  _getGameAndPlayer(req.params.id, req.body.clientId)
+  .then ({ game, player }) ->
     if game.currentTurn.phase != 1
-      return handleError(res, 'You cannot draw 2 during this phase.')
+      return Q.reject 'You cannot draw 2 during this phase.'
 
     _draw(game, player, 2)
 
@@ -190,17 +201,22 @@ exports.drawTwo = (req, res) ->
   .catch(_.partial(handleError, res))
 
 exports.join = (req, res) ->
+  console.log 'ok'
   findGameById(req.params.id)
   .then (game) ->
-    player = _findPlayerById(game, req.params.playerId)
+    console.log 'ok2'
+    player = _getPlayerById(game, req.params.playerId)
 
     if not player
-      return handleError(res, 'No such player.')
+      console.log 'uh-oh'
+      return Q.reject 'No such player.'
 
+    console.log 'ok3'
     player.clientId = req.body.clientId
 
     Q.ninvoke(game, 'save')
   .then (game) ->
+    console.log 'ok4'
     res.json 200, game
   .catch(_.partial(handleError, res))
 
@@ -209,7 +225,7 @@ exports.drawThree = (req, res) ->
   .then (game) ->
     player = game.players[0]
     if game.currentTurn.phase != 3
-      return handleError(res, 'You cannot draw 3 during this phase.')
+      return Q.reject 'You cannot draw 3 during this phase.'
 
     _draw(game, player, 3)
 
@@ -219,13 +235,12 @@ exports.drawThree = (req, res) ->
   .catch(_.partial(handleError, res))
 
 exports.buyBeanField = (req, res) ->
-  findGameById(req.params.id)
-  .then (game) ->
-    player = game.players[0]
+  _getGameAndPlayer(req.params.id, req.body.clientId)
+  .then ({ game, player }) ->
     if player.fields.length > 2
-      return handleError(res, 'You cannot purchase more than 3 beanfields.')
+      return Q.reject 'You cannot purchase more than 3 beanfields.'
     else if player.gold < 3
-      return handleError(res, 'You do not have enough gold to purchase a 3rd beanfield.')
+      return Q.reject 'You do not have enough gold to purchase a 3rd beanfield.'
 
     player.fields.push(player.fields.create { cards: [] })
     player.gold -= 3
@@ -241,7 +256,7 @@ exports.nextPhase = (req, res) ->
     if game.currentTurn.phase < 3
       game.currentTurn.phase++
     else
-      return handleError(res, 'This turn is already at the final phase.')
+      return Q.reject 'This turn is already at the final phase.'
 
     Q.ninvoke(game, 'save')
   .then (game) ->
@@ -275,3 +290,6 @@ exports.destroy = (req, res) ->
     game.remove (err) ->
       return handleError(res, err)  if err
       res.send 204
+
+exports.disconnect = (clientId) ->
+  true

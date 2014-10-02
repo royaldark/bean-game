@@ -5,6 +5,7 @@ Socket.io configuration
 
 crypto = require 'crypto'
 config = require './environment'
+gameController = require '../api/game/game.controller'
 
 clients = {}
 
@@ -16,7 +17,9 @@ key = (socket) ->
 
 # When the user disconnects.. perform this
 onDisconnect = (socket) ->
-  delete clients[key(socket)]
+  clientHash = key(socket)
+  delete clients[clientHash]
+  gameController.disconnect(clientHash)
 
 # When the user connects.. perform this
 onConnect = (socket) ->
