@@ -10,15 +10,20 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-12">
-      Current Player's Turn: {{ playGame.game.currentTurn.player }}<br>
-      Turn Number: {{ playGame.game.currentTurn.number + 1 }}<br>
-      Phase of Turn: {{ playGame.phases[playGame.game.currentTurn.phase] }}<br>
+      <section class="game-meta">
+        Current Player's Turn: {{ playGame.game.currentTurn.player }}<br>
+        Turn Number: {{ playGame.game.currentTurn.number + 1 }}<br>
+        Phase of Turn: {{ playGame.phases[playGame.game.currentTurn.phase] }}<br>
 
-      Players:
-      <div ng-repeat="player in playGame.game.players">
-        <strong>{{ player.name }}</strong><br>
-        <a ng-click="playGame.join(player._id)" ng-show="playGame.playerIndex === null">Join</a><br><br>
-      </div>
+        Players:
+        <div ng-repeat="player in playGame.game.players">
+          <strong>{{ player.name }}</strong>
+          <span ng-show="playGame.playerIndex === null"> - <a href="" ng-click="playGame.join(player._id)">Join<br></a></span>
+        </div>
+
+        You are player: {{ playGame.game.players[playGame.playerIndex].name }}<br>
+        Gold: {{ playGame.game.players[playGame.playerIndex].gold }}
+      </section>
 
       <section class="player-fields" ng-show="playGame.playerIndex !== null">
         Fields:<br>
@@ -40,13 +45,7 @@
         </span>
       </section>
 
-      <a ng-click="playGame.buyBeanField()">Buy Bean Field</a>
+      <button ng-click="playGame.buyBeanField()" ng-show="playGame.playerIndex !== null" ng-disabled="playGame.game.players[playGame.playerIndex].gold < 3">Buy 3rd Bean Field</button>
     </div>
   </div>
 </div>
-
-<footer class="footer">
-  <div class="container">
-    <p>Bohnanza 0.0.1 | <a href="https://github.com/royaldark/bean-game">Source Code</a></p>
-  </div>
-</footer>
