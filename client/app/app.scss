@@ -26,6 +26,17 @@ $fa-font-path: "/bower_components/font-awesome/fonts";
 
   .card {
     float: left;
+
+    img {
+      border-radius: 10px;
+      height: 200px;
+      width: 124px;
+
+      &:hover {
+        height: 300px;
+        width: 186px;
+      }
+    }
   }
 }
 

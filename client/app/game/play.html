@@ -25,7 +25,7 @@
         <div ng-repeat="field in playGame.game.players[playGame.playerIndex].fields track by $index">
           Field {{ $index + 1 }}:<br>
           <span ng-repeat="card in field.cards">
-            <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186"><br><br>
+            <img ng-src="{{ playGame.imagePath(card) }}"><br><br>
           </span>
         </div>
       </section>
@@ -33,7 +33,7 @@
       <section class="player-hand" ng-show="playGame.playerIndex !== null">
         Hand:<br>
         <span ng-repeat="card in playGame.game.players[playGame.playerIndex].hand" class="card">
-          <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186">
+          <img ng-src="{{ playGame.imagePath(card) }}">
           <!--<a ng-repeat="field in playGame.game.players[0].fields track by $index" ng-click="playGame.plant(card, $index)">
             Plant in Field {{ $index + 1 }}<br>
           </a>-->
