@@ -3,40 +3,42 @@
 <header class="hero-unit" id="banner">
   <div class="container">
     <h1>Play Game</h1>
-    <p class="lead">You're playing a game of Bohnanaza!</p>
+    Game: {{ playGame.game.name }}
   </div>
 </header>
 
 <div class="container">
   <div class="row">
     <div class="col-lg-12">
-      <h1 class="page-header">Game: {{ playGame.game.name }}</h1>
       Current Player's Turn: {{ playGame.game.currentTurn.player }}<br>
-      Turn Number: {{ playGame.game.currentTurn.number }}<br>
+      Turn Number: {{ playGame.game.currentTurn.number + 1 }}<br>
       Phase of Turn: {{ playGame.phases[playGame.game.currentTurn.phase] }}<br>
 
       Players:
       <div ng-repeat="player in playGame.game.players">
         <strong>{{ player.name }}</strong><br>
-        <a ng-click="playGame.join(player._id)">Join</a><br><br>
+        <a ng-click="playGame.join(player._id)" ng-show="playGame.playerIndex === null">Join</a><br><br>
       </div>
 
-      Fields:<br>
-      <div ng-repeat="field in playGame.game.players[0].fields track by $index">
-        Field {{ $index + 1 }}:<br>
-        <span ng-repeat="card in field.cards">
-          <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186"><br><br>
+      <section class="player-fields" ng-show="playGame.playerIndex !== null">
+        Fields:<br>
+        <div ng-repeat="field in playGame.game.players[playGame.playerIndex].fields track by $index">
+          Field {{ $index + 1 }}:<br>
+          <span ng-repeat="card in field.cards">
+            <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186"><br><br>
+          </span>
+        </div>
+      </section>
+
+      <section class="player-hand" ng-show="playGame.playerIndex !== null">
+        Hand:<br>
+        <span ng-repeat="card in playGame.game.players[playGame.playerIndex].hand" class="card">
+          <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186">
+          <!--<a ng-repeat="field in playGame.game.players[0].fields track by $index" ng-click="playGame.plant(card, $index)">
+            Plant in Field {{ $index + 1 }}<br>
+          </a>-->
         </span>
-      </div>
-
-      Hand:<br>
-      <span ng-repeat="card in playGame.game.players[0].hand">
-        <img ng-src="{{ playGame.imagePath(card) }}" height="300" width="186">
-        <a ng-repeat="field in playGame.game.players[0].fields track by $index" ng-click="playGame.plant(card, $index)">
-          Plant in Field {{ $index + 1 }}<br>
-        </a>
-        <br><br>
-      </span>
+      </section>
 
       <a ng-click="playGame.buyBeanField()">Buy Bean Field</a>
     </div>

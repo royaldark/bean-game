@@ -221,7 +221,7 @@ exports.join = (req, res) ->
 
     Q.ninvoke(game, 'save')
   .then (game) ->
-    res.json 200, game
+    res.json 200, game[0]
   .catch(_.partial(handleError, res))
 
 exports.drawThree = (req, res) ->

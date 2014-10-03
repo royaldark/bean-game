@@ -4,7 +4,9 @@ angular.module 'beansApp'
 .controller 'PlayGameCtrl', ($rootScope, $scope, $stateParams, socket, api) ->
   $scope.playGame =
     gameId: $stateParams.gameId
+    playerIndex: null
     game: null
+
     phases: [
       'Plant bean cards'
       'Draw, trade and donate bean cards'
@@ -23,7 +25,10 @@ angular.module 'beansApp'
       api.post("games/#{@gameId}/buyBeanField", clientId: $rootScope.clientKey)
 
     join: (playerIndex) ->
-      api.post("games/#{@gameId}/join/#{playerIndex}", clientId: $rootScope.clientKey)
+      api.post("games/#{@gameId}/join/#{playerIndex}", clientId: $rootScope.clientKey).then(
+        (response) =>
+          @playerIndex = _.findIndex(response.data.players, { clientId: $rootScope.clientKey })
+      )
 
   api.get("games/#{$stateParams.gameId}").success (game) ->
     $scope.playGame.game = game
